@@ -1,0 +1,430 @@
+
+body{
+    /* Desktop - 1 */
+    background: rgb(159, 158, 194);
+}
+
+
+.phone{
+    /* Rectangle 1 730l 178t   446 782*/
+    position: absolute;
+    width: 342px;
+    height: 548px;
+    left: 600px;
+    top: 110px;
+
+    border-radius: 42px;
+    background: rgb(143, 141, 178);
+}
+.phoneBlack{
+    /* Rectangle 3 */
+    position: absolute;
+    width: 340px;
+    height: 544px;
+    left: 612px;
+    top: 125px;
+    border-radius: 42px;
+    filter: blur(6px);
+    background: rgb(67, 64, 106);
+    opacity: 0.4;
+}
+.phoneWhite{
+    /* Rectangle 2 */
+    position: absolute;
+    width: 330px;
+    height: 540px;
+    left: 596px;
+    top: 109px;
+    border-radius: 42px;
+
+    filter: blur(3px);
+    background: rgb(205, 204, 228);
+    
+}
+
+/* Login */
+
+.loginButton{
+    /* Rectangle 19 */
+    position: absolute;
+    width: 195px;
+    height: 54px;
+    left: 679px;
+    top: 39px;  
+    border-radius: 47px;
+    background: rgb(143, 141, 178);
+    box-shadow: -4px -2px 4px rgba(229, 228, 240, 0.77), 4px 4px 4px rgba(47, 45, 80, 0.25);
+    color: rgb(49, 49, 49);
+    font-family: Jua;
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 45px;
+    letter-spacing: 0%;
+    text-align: center;
+    text-shadow: -1px -1px 1px rgba(255, 255, 255, 0.25), 1px 1px 1px rgba(0, 0, 0, 0.25);
+    outline: none;
+    border: none;
+    cursor: pointer;
+
+}
+
+.playBar{
+    /* Rectangle 6 */
+    position: absolute;
+    width: 254px;
+    height: 72px;
+    left: 647px;
+    top: 622px;   
+    border-radius: 49px;
+
+    background: rgb(143, 141, 178);
+}
+
+.playBarBlack{
+    /* Rectangle 10 */
+    position: absolute;
+    width: 231px;
+    height: 61px;
+    left: 670px;
+    top: 633px;
+    border-radius: 61px;
+
+    filter: blur(8px);
+    background: rgb(67, 64, 106);
+}
+
+.playBarWhite{
+    /* Rectangle 9 */
+    position: absolute;
+    width: 250px;
+    height: 70px;
+    left: 646px;
+    top: 622px;
+    border-radius: 61px;
+
+    filter: blur(4px);
+    background: rgb(205, 204, 228);
+}
+
+.leftPlay{
+/* Vector */
+    position: absolute;
+    width: 38px;
+    height: 30px;
+    left: 683px;
+    top: 643px;
+    filter: drop-shadow(-1px -1.5px 2px rgba(229, 228, 240, 1)) drop-shadow(2px 2px 2px rgba(47, 45, 80, 0.77));
+}
+
+.rightPlay{
+/* Vector */
+    position: absolute;
+    width: 37px;
+    height: 30px;
+    left: 826px;
+    top: 643px;
+    filter: drop-shadow(-1px -1.5px 2px rgba(229, 228, 240, 1)) drop-shadow(2px 2px 2px rgba(47, 45, 80, 0.77));
+}
+
+.play{
+    /* Polygon 1 */
+    position: absolute;
+    width: 53px;
+    height: 54px;
+    left: 755px;
+    top: 631.5px; 
+    filter: drop-shadow(-1px -1.5px 2px rgba(229, 228, 240, 1)) drop-shadow(2px 2px 2px rgba(47, 45, 80, 0.77));
+}
+
+.pause{
+    /* Vector 1 */
+    position: absolute;
+    width: 42px;
+    height: 47px;
+    left: 755px;
+    right: 1123px;
+    top: 634px;
+    bottom: 400px;
+    filter: drop-shadow(-1px -1.5px 2px rgba(229, 228, 240, 1)) drop-shadow(2px 2px 2px rgba(47, 45, 80, 0.77));
+}
+
+.album{
+    /* Doja_Cat_-_Planet_Her 1 */
+    position: absolute;
+    width: 264px;
+    height: 242px;
+    left: 641px;
+    top: 164px; 
+    border-radius: 47px;
+    background: url(planetHer.png);
+    background-size: cover;
+    background-position: center;
+    box-shadow: -4px -2px 4px rgba(229, 228, 240, 0.77), 4px 4px 4px rgba(47, 45, 80, 0.25);
+}
+
+.songName{
+    /* Options (feat. JID) */
+    position: absolute;
+    width: 245px;
+    height: 38px;
+    left: 652px;
+    top: 460px;  
+    color: rgb(49, 49, 49);
+    font-family: Jua;
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 38px;
+    letter-spacing: 0%;
+    text-align: center;
+    text-shadow: -1px -1px 1px rgba(255, 255, 255, 0.25), 1px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+.songTimeBar{
+    /* Line 1 */
+    position: absolute;
+    width: 250px;
+    height: 0;
+    left: 644.33px;
+    top: 512px; 
+    border: 3px solid rgb(62, 62, 62);
+    box-shadow: 1px 1px 1px 0px rgba(0, 0, 0, 0.25),-1px -1px 1px 0px rgba(255, 255, 255, 0.25); 
+}
+
+.timeLeft{
+    /* 0:00 */
+    position: absolute;
+    width: 27px;
+    height: 13px;
+    left: 614px;
+    top: 508px;
+    color: rgb(49, 49, 49);
+    font-family: Jua;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 15px;
+    letter-spacing: 0%;
+    text-align: center;
+    text-shadow: -1px -1px 1px rgba(255, 255, 255, 0.25), 1px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+.timeRight{
+    /* 0:00 */
+    position: absolute;
+    width: 27px;
+    height: 13px;
+    left: 901px;
+    top: 508px; 
+    color: rgb(49, 49, 49);
+    font-family: Jua;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 15px;
+    letter-spacing: 0%;
+    text-align: center; 
+    text-shadow: -1px -1px 1px rgba(255, 255, 255, 0.25), 1px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+.volume{
+    /* Vector */
+    position: absolute;
+    width: 31px;
+    height: 30px;
+    left: 662px;
+    top: 560px; 
+    filter: drop-shadow(-1px -1.5px 2px rgba(229, 228, 240, 1)) drop-shadow(2px 2px 2px rgba(47, 45, 80, 0.77)); 
+}
+
+.volumeLines{
+    /* Vector */
+    position: absolute;
+    width: 18px;
+    height: 23px;
+    left: 695px;
+    top: 564px; 
+    /* border: 5px solid rgb(49, 49, 49); */
+    filter: drop-shadow(-1px -1.5px 2px rgba(229, 228, 240, 1)) drop-shadow(2px 2px 2px rgba(47, 45, 80, 0.77));
+}
+
+.volumeBar{
+    /* Line 6 */
+    position: absolute;
+    width: 120.52px;
+    height: 0;
+    left: 735.34px;
+    top: 575px;
+    border: 3px solid rgb(74, 72, 110);   
+}
+
+.volumeBarEnd{
+    /* Rectangle 14 */
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    left: 850px;
+    top: 572px;
+    border-radius: 3px;
+
+    background: rgb(74, 72, 110);
+}
+
+.volumeBarBlack{
+    /* Line 5 */
+    position: absolute;
+    width: 140.19px;
+    height: 0;
+    left: 735.34px;
+    top: 575px;
+    border: 3px solid rgb(62, 62, 62);
+    box-shadow: 1px 1px 1px 0px rgba(0, 0, 0, 0.25),-1px -1px 1px 0px rgba(255, 255, 255, 0.25);
+}
+
+
+.moodBar{
+    /* Rectangle 28 */
+    position: absolute;
+    width: 414px;
+    height: 442px;
+    left: 1025px;
+    top: 171px;
+    border-radius: 61px;
+    background: rgb(143, 141, 178);
+}
+
+.moodBarBlack{
+    /* Rectangle 26 */
+    position: absolute;
+    width: 414px;
+    height: 442px;
+    left: 1039px;
+    top: 180px;
+    border-radius: 61px;
+    filter: blur(6px);
+    background: rgb(67, 64, 106);
+    opacity: 0.4;
+
+}
+
+.moodBarWhite{
+    /* Rectangle 27 */
+    position: absolute;
+    width: 406px;
+    height: 439px;
+    left: 1019px;
+    top: 167px;
+    border-radius: 61px;
+    filter: blur(4px);
+    background: rgb(205, 204, 228);
+}
+
+.moodTitle{
+    /* Mood Stats */
+    position: absolute;
+    width: 327px;
+    height: 38px;
+    left: 1068px;
+    top: 188px;
+    color: rgb(49, 49, 49);
+    font-family: Jua;
+    font-size: 48px;
+    font-weight: 400;
+    line-height: 60px;
+    letter-spacing: 0%;
+    text-align: center;
+    text-shadow: -1px -1px 1px rgba(255, 255, 255, 0.25), 1px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+.moodTextBox{
+    /* Depressed 82% Happy 5% Romantic 2% Relaxed 45% Sleepy 72% Annoyed 67% Playful 99% Mysterious 22% Angry 1% Excited 53% */
+    position: absolute;
+    width: 325px;
+    height: 322px;
+    left: 1071px;
+    top: 258px;
+    text-shadow: -1px -1px 1px rgba(255, 255, 255, 0.25), 1px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+.playlistsBar{
+    /* Rectangle 22 */
+    position: absolute;
+    width: 414px;
+    height: 442px;
+    left: 107px;
+    top: 171px;
+    border-radius: 61px;
+    background: rgb(143, 141, 178);
+}
+
+.playlistsBarLight{
+    /* Rectangle 21 */
+    position: absolute;
+    width: 402px;
+    height: 443px;
+    left: 101px;
+    top: 167px;
+    border-radius: 61px;
+    filter: blur(4px);
+    background: rgb(205, 204, 228);
+}
+
+.playlistsBarDark{
+    /* Rectangle 20 */
+    position: absolute;
+    width: 410px;
+    height: 446px;
+    left: 121px;
+    top: 176px;
+    border-radius: 61px;
+    filter: blur(6px);
+    background: rgb(67, 64, 106);
+    opacity: 0.4;
+
+}
+
+.playlistImages{
+    /* Doja_Cat_-_Planet_Her 2 */
+    position: absolute;
+    width: 116px;
+    height: 106px;
+    left: 139px;
+    top: 264px; 
+    border-radius: 24px;
+    background: url(planetHer.png);
+    background-size: cover;
+    background-position: center;
+    box-shadow: -4px -2px 4px rgba(229, 228, 240, 0.77), 4px 4px 4px rgba(47, 45, 80, 0.25);
+}
+
+
+
+.playlistsTitles{
+    /* Planet Her */
+    position: absolute;
+    width: 227px;
+    height: 34px;
+    left: 239px;
+    top: 304px;  
+    color: rgb(49, 49, 49);
+    font-family: Jua;
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 45px;
+    letter-spacing: 0%;
+    text-align: center;
+    text-shadow: -1px -1px 1px rgba(255, 255, 255, 0.25), 1px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+.playlistsTit{
+    /* Playlists */
+    position: absolute;
+    width: 227px;
+    height: 34px;
+    left: 198px;
+    top: 190px;
+    color: rgb(49, 49, 49);
+    font-family: Jua;
+    font-size: 48px;
+    font-weight: 400;
+    line-height: 60px;
+    letter-spacing: 0%;
+    text-align: center;
+    }
