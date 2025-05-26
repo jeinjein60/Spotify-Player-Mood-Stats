@@ -152,7 +152,7 @@ body{
     /* Doja_Cat_-_Planet_Her 1 */
     position: absolute;
     width: 264px;
-    height: 242px;
+    height: 264px;
     left: 641px;
     top: 164px; 
     border-radius: 47px;
@@ -341,6 +341,7 @@ body{
     left: 1071px;
     top: 258px;
     text-shadow: -1px -1px 1px rgba(255, 255, 255, 0.25), 1px 1px 1px rgba(0, 0, 0, 0.25);
+    font-size: 20px;
 }
 
 .playlistsBar{
@@ -384,7 +385,7 @@ body{
     /* Doja_Cat_-_Planet_Her 2 */
     position: absolute;
     width: 116px;
-    height: 106px;
+    height: 116px;
     left: 139px;
     top: 264px; 
     border-radius: 24px;
