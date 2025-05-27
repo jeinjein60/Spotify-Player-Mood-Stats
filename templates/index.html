@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+
+    <style>
+          #pauseButton {
+            display: none;
+  }
+    </style>
+    <link href='https://fonts.googleapis.com/css?family=Jua' rel='stylesheet'>
+    <title>Spotify Player</title>
+</head>
+
+<body>
+    <div class="phoneBlack"></div>
+    <div class="phoneWhite"></div>
+    <div class="phone"></div>
+    <button class="loginButton" onclick="window.location.href='/login'">Login</button>
+    <div class="playBarWhite"></div>
+    <div class="playBarBlack"></div>
+    <div class="playBar"></div>
+    <img src="leftplay.svg" class="leftPlay" alt="Backwards">
+    <img src="rightplay.svg" class="rightPlay" alt="Forward">
+    <img src="play.svg" class="play" alt="PlaySong" onclick="resumePlayback()" id="playButton">
+    <img src="pause.svg" class="pause" alt="PauseSong" onclick="togglePlayPause()" id="pauseButton">
+    <div class="album"></div>
+    <div class="songName" id="songName">Loading...</div>
+    <div class="songTimeBar"></div>
+    <div class="timeLeft">0:00</div>
+    <div class="timeRight">0:00</div>
+    <img src="volume.svg" class="volume" alt="VolumeIcon">
+    <img src="lines.svg" class="volumeLines" alt="VolumeLinesIcon">
+    <div class="volumeBarBlack"></div>
+    <div class="volumeBar"></div>
+    <div class="volumeBarEnd"></div>
+    <div class="moodBarBlack"></div>
+    <div class="moodBarWhite"></div>
+    <div class="moodBar"></div>
+    <div class="moodTitle">Mood Stats</div>
+    <div class="moodTextBox">Depressed 82%</div>
+    <div class="playlistsBarDark"></div>
+    <div class="playlistsBarLight"></div>
+    <div class="playlistsBar">
+        <h1 class="playlistsTit">Playlists</h1>
+        <div class="playlistScrollArea">
+            
+        </div>
+    </div>
+</body>
+<script>
+async function loadPlaylists() {
+    const response = await fetch('/playlists');
+    const playlists = await response.json();
+    const imageContainer = document.querySelector('.playlistScrollArea');
+    imageContainer.innerHTML = '';
+
+    playlists.forEach(p => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'playlistsItem';
+
+        const img = document.createElement('img');
+        img.src = p.image || 'planetHer.jpg';
+        img.alt = p.name;
+        img.className = 'playlistImages';
+        img.onclick = () => playRandomSong(p.id);
+
+        const title = document.createElement('div');
+        title.className = 'playlistsTitles';
+        title.innerText = p.name;
+        title.onclick = () => playRandomSong(p.id);
+        wrapper.appendChild(img);
+        wrapper.appendChild(title);
+
+
+
+        imageContainer.appendChild(wrapper);
+    });
+}
+
+
+async function playRandomSong(playlistId) {
+    const res = await fetch(`/play_random/${playlistId}`);
+    const data = await res.json();
+    if (data.status === 'playing') {
+        alert(`Now playing: ${data.track_uri}`);
+    } else {
+        alert(`Error: ${data.message}`);
+    }
+}
+
+async function resumePlayback() {
+    const res = await fetch('/resume_playback');
+    const data = await res.json();
+    console.log(data);
+}
+
+async function updateCurrentSong() {
+    const res = await fetch('/current_song');
+    const data = await res.json();
+    document.getElementById('songName').innerText = data.name || "Nothing playing";
+}
+
+async function pausePlayback() {
+    const res = await fetch('/pause_playback');
+    const data = await res.json();
+    console.log(data);
+}
+
+let isPlaying = false;
+
+async function togglePlayPause() {
+    if (!isPlaying) {
+        const res = await fetch('/resume_playback');
+        const data = await res.json();
+        if (data.status === 'resumed') {
+            isPlaying = true;
+            document.getElementById('playButton').style.display = 'none';
+            document.getElementById('pauseButton').style.display = 'inline';
+        }
+    } else {
+        const res = await fetch('/pause_playback');
+        const data = await res.json();
+        if (data.status === 'paused') {
+            isPlaying = false;
+            document.getElementById('playButton').style.display = 'inline';
+            document.getElementById('pauseButton').style.display = 'none';
+        }
+    }
+}
+
+window.onload = async () => {
+    loadPlaylists();
+    const res = await fetch('/current_song');
+    const data = await res.json();
+    isPlaying = data.is_playing || false;
+    document.getElementById('playButton').style.display = isPlaying ? 'none' : 'inline';
+    document.getElementById('pauseButton').style.display = isPlaying ? 'inline' : 'none';
+};
+
+
+window.onload = loadPlaylists;
+</script>
+
+</html>
+
