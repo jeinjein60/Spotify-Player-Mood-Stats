@@ -28,7 +28,8 @@ sp_oauth = SpotifyOAuth(
 @app.route('/')
 def index():
     if 'token_info' in session:
-        return render_template('index.html')
+        access_token = session['token_info']['access_token']
+        return render_template('index.html', access_token=access_token)
     return redirect('/login')
 
 @app.route('/login')
@@ -53,13 +54,6 @@ def playlists():
     } for p in results['items']]
     return jsonify(playlists)
 
-
-@app.route('/resume_playback')
-def resume_playback():
-    sp = Spotify(auth=session['token_info']['access_token'])
-    sp.start_playback()
-    return jsonify({'status': 'resumed'})
-
 @app.route('/current_song')
 def current_song():
     sp = Spotify(auth=session['token_info']['access_token'])
@@ -72,30 +66,61 @@ def current_song():
         })
     return jsonify({'name': None, 'is_playing': False})
 
+@app.route('/resume_playback', methods=['PUT', 'GET'])
+def resume_playback():
+    access_token = session.get('access_token')
+    if not access_token:
+        return jsonify({'error': 'No access token found'}), 401
+    device_id = request.args.get('device_id')
+    url = 'https://api.spotify.com/v1/me/player/play'
+    if device_id:
+        url += f'?device_id={device_id}'
 
-@app.route('/pause_playback')
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/json'
+    }
+    body = {}
+    response = request.put(url, headers=headers, json=body)
+
+    if response.status_code == 204:
+        return jsonify({'status': 'resumed'})
+    else:
+        return jsonify({'error': 'Failed to resume playback', 'details': response.json()}), response.status_code
+
+@app.route('/pause_playback', methods=['PUT'])
 def pause_playback():
-    sp = Spotify(auth=session['token_info']['access_token'])
-    sp.pause_playback()
-    return jsonify({'status': 'paused'})
+    access_token = session.get('token_info', {}).get('access_token')
+    if not access_token:
+        return jsonify({'error': 'No access token available'}), 401
 
+    sp = Spotify(auth=access_token)
+    try:
+        sp.pause_playback()
+        return jsonify({'status': 'paused'})
+    except SpotifyException as e:
+        return jsonify({'error': 'Failed to pause playback', 'details': str(e)}), 400
 
 
 @app.route('/play_random/<playlist_id>')
 def play_random(playlist_id):
     sp = Spotify(auth=session['token_info']['access_token'])
-    tracks = sp.playlist_tracks(playlist_id)['items']
-    track_uris = [item['track']['uri'] for item in tracks if item['track']]
-    if track_uris:
-        random_track = random.choice(track_uris)
-        sp.start_playback(uris=[random_track])
-        return jsonify({'status': 'playing', 'track_uri': random_track})
-    return jsonify({'status': 'error', 'message': 'No tracks found'})
+    results = sp.playlist_tracks(playlist_id)
+    tracks = results['items']
+    random_track = random.choice(tracks)['track']
+    return jsonify({
+        'track_uri': random_track['uri'],
+        'name': random_track['name'],
+        'album_image': random_track['album']['images'][0]['url']
+    })
 
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
     'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+
+
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

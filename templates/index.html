@@ -4,14 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
-
     <style>
-          #pauseButton {
+        #pauseButton {
             display: none;
-  }
+        }
     </style>
     <link href='https://fonts.googleapis.com/css?family=Jua' rel='stylesheet'>
     <title>Spotify Player</title>
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
 </head>
 
 <body>
@@ -22,17 +22,17 @@
     <div class="playBarWhite"></div>
     <div class="playBarBlack"></div>
     <div class="playBar"></div>
-    <img src="leftplay.svg" class="leftPlay" alt="Backwards">
-    <img src="rightplay.svg" class="rightPlay" alt="Forward">
-    <img src="play.svg" class="play" alt="PlaySong" onclick="resumePlayback()" id="playButton">
-    <img src="pause.svg" class="pause" alt="PauseSong" onclick="togglePlayPause()" id="pauseButton">
+    <img src="{{ url_for('static', filename='leftplay.svg' )}}" class="leftPlay" alt="Backwards">
+    <img src="{{ url_for('static', filename='rightplay.svg') }}" class="rightPlay" alt="Forward">
+    <img src="{{ url_for('static', filename='play.svg') }}" class="play" alt="PlaySong" onclick="resumePlayback()" id="playButton">
+    <img src="{{ url_for('static', filename='pause.svg') }}" class="pause" alt="PauseSong" onclick="togglePlayPause()" id="pauseButton">
     <div class="album"></div>
     <div class="songName" id="songName">Loading...</div>
     <div class="songTimeBar"></div>
     <div class="timeLeft">0:00</div>
     <div class="timeRight">0:00</div>
-    <img src="volume.svg" class="volume" alt="VolumeIcon">
-    <img src="lines.svg" class="volumeLines" alt="VolumeLinesIcon">
+    <img src="{{ url_for('static', filename='volume.svg') }}" class="volume" alt="VolumeIcon">
+    <img src="{{ url_for('static', filename='lines.svg') }}" class="volumeLines" alt="VolumeLinesIcon">
     <div class="volumeBarBlack"></div>
     <div class="volumeBar"></div>
     <div class="volumeBarEnd"></div>
@@ -45,103 +45,150 @@
     <div class="playlistsBarLight"></div>
     <div class="playlistsBar">
         <h1 class="playlistsTit">Playlists</h1>
-        <div class="playlistScrollArea">
-            
-        </div>
+        <div class="playlistScrollArea"></div>
     </div>
 </body>
+
 <script>
-async function loadPlaylists() {
-    const response = await fetch('/playlists');
-    const playlists = await response.json();
-    const imageContainer = document.querySelector('.playlistScrollArea');
-    imageContainer.innerHTML = '';
+    const token = '{{ access_token }}';
+    let device_id = null;
 
-    playlists.forEach(p => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'playlistsItem';
+    async function loadPlaylists() {
+        const response = await fetch('/playlists');
+        const playlists = await response.json();
+        const imageContainer = document.querySelector('.playlistScrollArea');
+        imageContainer.innerHTML = '';
 
-        const img = document.createElement('img');
-        img.src = p.image || 'planetHer.jpg';
-        img.alt = p.name;
-        img.className = 'playlistImages';
-        img.onclick = () => playRandomSong(p.id);
+        playlists.forEach(p => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'playlistsItem';
+            const img = document.createElement('img');
+            img.src = p.image || 'planetHer.jpg';
+            img.alt = p.name;
+            img.className = 'playlistImages';
+            img.onclick = () => playRandomSong(p.id);
+            const title = document.createElement('div');
+            title.className = 'playlistsTitles';
+            title.innerText = p.name;
+            title.onclick = () => playRandomSong(p.id);
+            wrapper.appendChild(img);
+            wrapper.appendChild(title);
 
-        const title = document.createElement('div');
-        title.className = 'playlistsTitles';
-        title.innerText = p.name;
-        title.onclick = () => playRandomSong(p.id);
-        wrapper.appendChild(img);
-        wrapper.appendChild(title);
-
-
-
-        imageContainer.appendChild(wrapper);
-    });
-}
-
-
-async function playRandomSong(playlistId) {
-    const res = await fetch(`/play_random/${playlistId}`);
-    const data = await res.json();
-    if (data.status === 'playing') {
-        alert(`Now playing: ${data.track_uri}`);
-    } else {
-        alert(`Error: ${data.message}`);
+            imageContainer.appendChild(wrapper);
+        });
     }
-}
 
-async function resumePlayback() {
-    const res = await fetch('/resume_playback');
-    const data = await res.json();
-    console.log(data);
-}
 
-async function updateCurrentSong() {
-    const res = await fetch('/current_song');
-    const data = await res.json();
-    document.getElementById('songName').innerText = data.name || "Nothing playing";
-}
+    function playRandomSong(playlist_id) {
+        fetch(`/play_random/${playlist_id}`)
+            .then(response => response.json())
+            .then(data => {
+            document.getElementById('songName').innerText = data.name;
+            document.querySelector('.album').style.backgroundImage = `url(${data.album_image})`;
+            fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    uris: [data.track_uri]
+                })
+            });
+        });
+    }
 
-async function pausePlayback() {
-    const res = await fetch('/pause_playback');
-    const data = await res.json();
-    console.log(data);
-}
+    async function resumePlayback() {
+        const res = await fetch('/resume_playback?device_id=' + device_id, {
+            method: 'PUT'
+        });
 
-let isPlaying = false;
-
-async function togglePlayPause() {
-    if (!isPlaying) {
-        const res = await fetch('/resume_playback');
         const data = await res.json();
-        if (data.status === 'resumed') {
-            isPlaying = true;
-            document.getElementById('playButton').style.display = 'none';
-            document.getElementById('pauseButton').style.display = 'inline';
-        }
-    } else {
-        const res = await fetch('/pause_playback');
+        console.log(data);
+    }
+
+
+    async function updateCurrentSong() {
+        const res = await fetch('/current_song');
         const data = await res.json();
-        if (data.status === 'paused') {
-            isPlaying = false;
-            document.getElementById('playButton').style.display = 'inline';
-            document.getElementById('pauseButton').style.display = 'none';
+        document.getElementById('songName').innerText = data.name || "Nothing playing";
+    }
+
+    async function pausePlayback() {
+        const res = await fetch('/pause_playback', { method: 'PUT' });
+        const data = await res.json();
+        console.log(data);
+    }
+
+
+    let isPlaying = false;
+    async function togglePlayPause() {
+        if (!isPlaying) {
+            const res = await fetch('/resume_playback');
+            const data = await res.json();
+            if (data.status === 'resumed') {
+                isPlaying = true;
+                document.getElementById('playButton').style.display = 'none';
+                document.getElementById('pauseButton').style.display = 'inline';
+            }
+        } 
+        else {
+            const res = await fetch('/pause_playback');
+            const data = await res.json();
+
+            if (data.status === 'paused') {
+                isPlaying = false;
+                document.getElementById('playButton').style.display = 'inline';
+                document.getElementById('pauseButton').style.display = 'none';
+            }
         }
     }
-}
 
-window.onload = async () => {
-    loadPlaylists();
-    const res = await fetch('/current_song');
-    const data = await res.json();
-    isPlaying = data.is_playing || false;
-    document.getElementById('playButton').style.display = isPlaying ? 'none' : 'inline';
-    document.getElementById('pauseButton').style.display = isPlaying ? 'inline' : 'none';
-};
+    function updateUI(track) {
+        document.getElementById('songName').innerText = track.name;
+        document.querySelector('.album').style.backgroundImage = `url(${track.album.images[0].url})`;
+    }
+
+    window.onSpotifyWebPlaybackSDKReady = () => {
+        const token = '{{ access_token }}';
+
+        player = new Spotify.Player({
+            name: 'My Web Player',
+            getOAuthToken: cb => { cb(token); },
+            volume: 0.5
+        });
+
+        player.addListener('ready', ({ device_id: id }) => {
+            console.log('Web player ready:', id);
+            device_id = id;
+
+            fetch('https://api.spotify.com/v1/me/player', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    device_ids: [device_id],
+                    play: false
+                })
+            });
+        });
+
+        player.connect();
+    };
+
+    window.onload = async () => {
+        await loadPlaylists();
+        const res = await fetch('/current_song');
+        const data = await res.json();
+        isPlaying = data.is_playing || false;
+        document.getElementById('playButton').style.display = isPlaying ? 'none' : 'inline';
+        document.getElementById('pauseButton').style.display = isPlaying ? 'inline' : 'none';
+        let player;
+    };
 
 
-window.onload = loadPlaylists;
 </script>
 
 </html>
