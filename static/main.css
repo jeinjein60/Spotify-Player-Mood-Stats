@@ -165,13 +165,13 @@ body{
 .songName{
     /* Options (feat. JID) */
     position: absolute;
-    width: 245px;
+    width: 500px;
     height: 38px;
-    left: 652px;
+    left: 525px;
     top: 460px;  
     color: rgb(49, 49, 49);
     font-family: Jua;
-    font-size: 30px;
+    font-size: 20px;
     font-weight: 400;
     line-height: 38px;
     letter-spacing: 0%;

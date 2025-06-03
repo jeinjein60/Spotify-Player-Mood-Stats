@@ -24,7 +24,7 @@
     <div class="playBar"></div>
     <img src="{{ url_for('static', filename='leftplay.svg' )}}" class="leftPlay" alt="Backwards">
     <img src="{{ url_for('static', filename='rightplay.svg') }}" class="rightPlay" alt="Forward">
-    <img src="{{ url_for('static', filename='play.svg') }}" class="play" alt="PlaySong" onclick="resumePlayback()" id="playButton">
+    <img src="{{ url_for('static', filename='play.svg') }}" class="play" alt="PlaySong" onclick="togglePlayPause()" id="playButton">
     <img src="{{ url_for('static', filename='pause.svg') }}" class="pause" alt="PauseSong" onclick="togglePlayPause()" id="pauseButton">
     <div class="album"></div>
     <div class="songName" id="songName">Loading...</div>
@@ -124,7 +124,7 @@
     let isPlaying = false;
     async function togglePlayPause() {
         if (!isPlaying) {
-            const res = await fetch('/resume_playback');
+            const res = await fetch('/resume_playback', {method: 'PUT' });
             const data = await res.json();
             if (data.status === 'resumed') {
                 isPlaying = true;
@@ -133,7 +133,7 @@
             }
         } 
         else {
-            const res = await fetch('/pause_playback');
+            const res = await fetch('/pause_playback', { method: 'PUT' });
             const data = await res.json();
 
             if (data.status === 'paused') {

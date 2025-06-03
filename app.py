@@ -3,7 +3,9 @@ from flask import Flask, session, redirect, url_for, request, render_template, j
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.cache_handler import FlaskSessionCacheHandler
+from spotipy.exceptions import SpotifyException
 import random
+import time
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(32)
@@ -24,6 +26,15 @@ sp_oauth = SpotifyOAuth(
     cache_handler=FlaskSessionCacheHandler(session),
     show_dialog=True
 )
+
+def get_token(): #top
+    token_info = session.get('token_info', None)
+    if token_info:
+        if token_info['expires_at'] - int(time.time()) < 60:
+            sp_oauth = create_spotify_oauth()
+            token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
+            session['token_info'] = token_info
+    return token_info
 
 @app.route('/')
 def index():
@@ -66,27 +77,27 @@ def current_song():
         })
     return jsonify({'name': None, 'is_playing': False})
 
-@app.route('/resume_playback', methods=['PUT', 'GET'])
+@app.route('/resume_playback', methods=['PUT'])
 def resume_playback():
-    access_token = session.get('access_token')
-    if not access_token:
+    token_info = get_token()
+    if not token_info:
         return jsonify({'error': 'No access token found'}), 401
+    
+
+    access_token = token_info['access_token']
+    sp = Spotify(auth=access_token)
     device_id = request.args.get('device_id')
-    url = 'https://api.spotify.com/v1/me/player/play'
-    if device_id:
-        url += f'?device_id={device_id}'
-
-    headers = {
-        'Authorization': f'Bearer {access_token}',
-        'Content-Type': 'application/json'
-    }
-    body = {}
-    response = request.put(url, headers=headers, json=body)
-
-    if response.status_code == 204:
+    try:
+        if device_id:
+            sp.start_playback(device_id=device_id)
+        else:
+            sp.start_playback()
         return jsonify({'status': 'resumed'})
-    else:
-        return jsonify({'error': 'Failed to resume playback', 'details': response.json()}), response.status_code
+    
+    except Exception as e:
+        return jsonify({'error': 'Failed to resume playback', 'details': str(e)}), 500
+
+
 
 @app.route('/pause_playback', methods=['PUT'])
 def pause_playback():
