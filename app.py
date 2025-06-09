@@ -48,6 +48,11 @@ def login():
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
+
 @app.route('/callback')
 def callback():
     token_info = sp_oauth.get_access_token(request.args['code'])
@@ -64,6 +69,19 @@ def playlists():
         'image': p['images'][0]['url'] if p['images'] else ''
     } for p in results['items']]
     return jsonify(playlists)
+
+
+@app.route('/play_random/<playlist_id>')
+def play_random(playlist_id):
+    sp = Spotify(auth=session['token_info']['access_token'])
+    results = sp.playlist_tracks(playlist_id)
+    tracks = results['items']
+    random_track = random.choice(tracks)['track']
+    return jsonify({
+        'track_uri': random_track['uri'],
+        'name': random_track['name'],
+        'album_image': random_track['album']['images'][0]['url']
+    })
 
 @app.route('/current_song')
 def current_song():
@@ -98,7 +116,6 @@ def resume_playback():
         return jsonify({'error': 'Failed to resume playback', 'details': str(e)}), 500
 
 
-
 @app.route('/pause_playback', methods=['PUT'])
 def pause_playback():
     access_token = session.get('token_info', {}).get('access_token')
@@ -112,26 +129,10 @@ def pause_playback():
     except SpotifyException as e:
         return jsonify({'error': 'Failed to pause playback', 'details': str(e)}), 400
 
-
-@app.route('/play_random/<playlist_id>')
-def play_random(playlist_id):
-    sp = Spotify(auth=session['token_info']['access_token'])
-    results = sp.playlist_tracks(playlist_id)
-    tracks = results['items']
-    random_track = random.choice(tracks)['track']
-    return jsonify({
-        'track_uri': random_track['uri'],
-        'name': random_track['name'],
-        'album_image': random_track['album']['images'][0]['url']
-    })
-
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
     'favicon.ico', mimetype='image/vnd.microsoft.icon')
-
-
-
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
