@@ -365,8 +365,10 @@
         const res = await fetch('/current_song');
         const data = await res.json();
         isPlaying = data.is_playing || false;
-        document.getElementById('playButton').style.display = isPlaying ? 'none' : 'inline';
-        document.getElementById('pauseButton').style.display = isPlaying ? 'inline' : 'none';
+        // document.getElementById('playButton').style.display = isPlaying ? 'none' : 'inline';
+        // document.getElementById('pauseButton').style.display = isPlaying ? 'inline' : 'none';
+        document.getElementById('pauseButton').style.display = isPlaying ? 'none' : 'inline';
+        document.getElementById('playButton').style.display = isPlaying ? 'inline' : 'none';
         const genreCounts = await getUserTopGenres();
         const moodStats = mapGenresToMoods(genreCounts);
         displayMoodStats(moodStats);

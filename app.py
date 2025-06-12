@@ -31,7 +31,6 @@ def get_token(): #top
     token_info = session.get('token_info', None)
     if token_info:
         if token_info['expires_at'] - int(time.time()) < 60:
-            sp_oauth = create_spotify_oauth()
             token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
             session['token_info'] = token_info
     return token_info
