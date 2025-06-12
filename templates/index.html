@@ -22,8 +22,6 @@
     <div class="playBarWhite"></div>
     <div class="playBarBlack"></div>
     <div class="playBar"></div>
-    <!-- <img src="{{ url_for('static', filename='leftplay.svg' )}}" class="leftPlay" alt="Backwards">
-    <img src="{{ url_for('static', filename='rightplay.svg') }}" class="rightPlay" alt="Forward"> -->
     <img src="{{ url_for('static', filename='play.svg') }}" class="play" alt="PlaySong" onclick="togglePlayPause()" id="playButton">
     <img src="{{ url_for('static', filename='pause.svg') }}" class="pause" alt="PauseSong" onclick="togglePlayPause()" id="pauseButton">
     <div class="album"></div>
@@ -50,6 +48,51 @@
 </body>
 
 <script>
+    //volume bar
+    document.addEventListener("DOMContentLoaded", () => {
+        const volumeBarBlack = document.querySelector('.volumeBarBlack');
+        const volumeBar = document.querySelector('.volumeBar');
+        const volumeBarEnd = document.querySelector('.volumeBarEnd');
+
+        const barStartX = 735.34;
+        const barMaxWidth = 140.19;
+
+        let isDragging = false;
+
+        volumeBarEnd.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            e.preventDefault();
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+
+        let newX = e.clientX;
+        let offsetX = newX - barStartX;
+
+        offsetX = Math.max(0, Math.min(offsetX, barMaxWidth));
+
+        volumeBarEnd.style.left = `${barStartX + offsetX}px`;
+        volumeBar.style.width = `${offsetX}px`;
+
+        const volume = offsetX / barMaxWidth;
+        console.log("Volume level:", volume.toFixed(2));
+        if (window.player && typeof window.player.setVolume === 'function') {
+            window.player.setVolume(volume).catch(err => console.error('Volume error:', err));
+        }
+
+    });
+    document.getElementById("audio").volume = volume;
+
+});  
+</script>
+
+<script>
+    //playlists, song play, pause/unpause, song time
     const token = '{{ access_token }}';
     let device_id = null;
     let currentPlaylistId = null;
@@ -189,9 +232,103 @@
         }
     }
 
+    function formatTime(ms) {
+        const totalSeconds = Math.floor(ms/1000);
+        const minutes = Math.floor(totalSeconds/60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+    let songLength = null;
+
+    function minutesUpdater(player){
+        clearInterval(songLength);
+        songLength = setInterval(async () => {
+            const state = await player.getCurrentState();
+            if (!state) return;
+
+            const currentMs = state.position;
+            const durationMs = state.duration;
+
+            document.querySelector('.timeLeft').innerText = formatTime(currentMs);
+            document.querySelector('.timeRight').innerText = formatTime(durationMs);
+        }, 1000); 
+    }
+
+    const moodBarStats = {
+        Calm: ['country', 'instrumental', 'classical'],
+        Chill: ['lofi', 'rnb', 'blues'],
+        Energetic: ['rock', 'hip-hop', 'rap', 'pop'],
+        Flirty: ['romantic', 'jazz', 'rnb'],
+        Angry: ['mean pop', 'glitchcore', 'electronic']
+    };
+
+    async function getUserTopGenres() {
+        const res = await fetch("https://api.spotify.com/v1/me/top/tracks?limit=50", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        const data = await res.json();
+
+        const genreCounts = {};
+
+        for (const item of data.items) {
+            const artistId = item.artists[0].id;
+            const artistRes = await fetch(`https://api.spotify.com/v1/artists/${artistId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const artistData = await artistRes.json();
+            const genres = artistData.genres;
+
+            genres.forEach(genre => {
+                genre = genre.toLowerCase();
+                genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+            });
+        }
+
+        return genreCounts;
+    }
+    function mapGenresToMoods(genreCounts) {
+        const moodScores = {
+            Calm: 0,
+            Chill: 0,
+            Energetic: 0,
+            Flirty: 0,
+            Angry: 0
+        };
+
+        let total = 0;
+
+        for (const [genre, count] of Object.entries(genreCounts)) {
+            for (const [mood, moodGenres] of Object.entries(moodBarStats)) {
+                if (moodGenres.some(g => genre.includes(g))) {
+                    moodScores[mood] += count;
+                    total += count;
+                    break;
+                }
+            }
+        }
+        const moodPercentages = {};
+        for (const mood in moodScores) {
+            moodPercentages[mood] = total ? Math.round((moodScores[mood] / total) * 100) : 0;
+        }
+
+        return moodPercentages;
+    }
+
+    function displayMoodStats(moodStats) {
+        const moodBox = document.querySelector('.moodTextBox');
+        moodBox.innerHTML = '';
+
+        for (const [mood, percentage] of Object.entries(moodStats)) {
+            const line = document.createElement('div');
+            line.innerText = `${mood}: ${percentage}%`;
+            moodBox.appendChild(line);
+        }
+    }
 
     window.onSpotifyWebPlaybackSDKReady = () => {
-        const player = new Spotify.Player({
+        window.player = new Spotify.Player({
             name: 'My Web Player',
             getOAuthToken: cb => { cb(token); },
             volume: 0.5
@@ -202,22 +339,23 @@
             console.log('Ready with Device ID', id);
         });
 
-    player.addListener('player_state_changed', state => {
-        if (!state || !state.track_window || !state.track_window.current_track) return;
+        player.addListener('player_state_changed', state => {
+            if (!state || !state.track_window || !state.track_window.current_track) return;
 
-        const currentTrackId = state.track_window.current_track.id;
-        const isTrackEnded = state.paused && state.position === 0;
+            const currentTrackId = state.track_window.current_track.id;
+            const isTrackEnded = state.paused && state.position === 0;
 
-        if (isTrackEnded && !isChangingTrack && currentTrackId !== lastTrackId) {
-            isChangingTrack = true;
-            lastTrackId = currentTrackId;
+            minutesUpdater(player);
 
-            playRandomTrackFromPlaylist().then(() => {
-                isChangingTrack = false;
-            });
-        }
-    });
+            if (isTrackEnded && !isChangingTrack && currentTrackId !== lastTrackId) {
+                isChangingTrack = true;
+                lastTrackId = currentTrackId;
 
+                playRandomTrackFromPlaylist().then(() => {
+                    isChangingTrack = false;
+                });
+            }
+        });
 
         player.connect();
     };
@@ -229,6 +367,10 @@
         isPlaying = data.is_playing || false;
         document.getElementById('playButton').style.display = isPlaying ? 'none' : 'inline';
         document.getElementById('pauseButton').style.display = isPlaying ? 'inline' : 'none';
+        const genreCounts = await getUserTopGenres();
+        const moodStats = mapGenresToMoods(genreCounts);
+        displayMoodStats(moodStats);
+        
     };
 
 </script>

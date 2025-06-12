@@ -15,7 +15,7 @@ client_secret = 'b1cdc53dc4ab476894845cc9597c538b'
 redirect_uri = 'http://127.0.0.1:5000/callback'
 
 
-scope = 'user-read-private, playlist-read-private, streaming, user-modify-playback-state, user-read-playback-state'
+scope = 'user-read-private, playlist-read-private, streaming, user-modify-playback-state, user-read-playback-state, user-top-read'
 
 
 sp_oauth = SpotifyOAuth(
